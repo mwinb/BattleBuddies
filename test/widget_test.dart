@@ -1,30 +1,34 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:battle_buddies/main.dart';
+import 'package:battle_buddies/widgets/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+  const buttonText = 'New Outing';
+  const alertText = 'Coming Soon';
+  const closeDialog = 'Check In';
+  testWidgets('Executes Alert Dialog When Clicking Button',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(BattleBuddies());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text(buttonText), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.tap(find.byType(MaterialButton));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text(alertText), findsOneWidget);
+  });
+
+  testWidgets('Closes Alert Dialog When Clicking Continue',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(BattleBuddies());
+    // Open Dialog
+    await tester.tap(find.byType(MaterialButton));
+    await tester.pump();
+    // Click closeDialog button.
+    await tester.tap(find.text(closeDialog));
+    await tester.pump();
+
+    expect(find.text(alertText), findsNothing);
   });
 }
