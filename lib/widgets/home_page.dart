@@ -1,6 +1,8 @@
 import 'package:battle_buddies/main.dart';
 import 'package:flutter/material.dart';
 
+import 'new_outing.dart';
+
 class HomeStrings {
   get titleSelectType => 'Choose Interval Type';
   get buttonAuto => 'Auto';
@@ -9,29 +11,20 @@ class HomeStrings {
 }
 
 class HomePage extends StatelessWidget {
-  HomePage({Key key, this.title}) : super(key: key);
+  HomePage({Key key}) : super(key: key);
+  static const routeName = '/';
 
-  final String title;
   final HomeStrings _homeStrings = HomeStrings();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            MaterialButton(
-                color: appTheme.buttonColor,
-                textColor: appTheme.primaryTextTheme.body1.color,
-                onPressed: () => _selectEventType(context, _homeStrings),
-                child: Text(_homeStrings.buttonNewOuting)),
-          ],
-        ),
-      ),
+    return Container(
+      alignment: Alignment.center,
+      child: MaterialButton(
+          color: appTheme.buttonColor,
+          textColor: appTheme.primaryTextTheme.body1.color,
+          onPressed: () => _selectEventType(context, _homeStrings),
+          child: Text(_homeStrings.buttonNewOuting)),
     );
   }
 }
@@ -58,7 +51,11 @@ Future<void> _selectEventType(
                     textColor: appTheme.primaryTextTheme.body1.color,
                     child: Text(_homeStrings.buttonAuto),
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.pushNamed(
+                        context,
+                        NewOuting.routeName,
+                        arguments: OutingArguments(true),
+                      );
                     },
                   ),
                   MaterialButton(
@@ -66,7 +63,11 @@ Future<void> _selectEventType(
                     textColor: appTheme.primaryTextTheme.body1.color,
                     child: Text(_homeStrings.buttonCheckIn),
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.pushNamed(
+                        context,
+                        NewOuting.routeName,
+                        arguments: OutingArguments(false),
+                      );
                     },
                   ),
                 ],

@@ -1,4 +1,3 @@
-import 'package:battle_buddies/main.dart';
 import 'package:battle_buddies/widgets/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,7 +8,9 @@ void main() {
   testWidgets(
       'Executes Alert Dialog When Clicking ${HomeStrings().buttonNewOuting}',
       (WidgetTester tester) async {
-    await tester.pumpWidget(BattleBuddies());
+    await tester.pumpWidget(MaterialApp(
+      home: HomePage(),
+    ));
 
     expect(find.text(_widgetStrings.buttonNewOuting), findsOneWidget);
 
@@ -23,7 +24,9 @@ void main() {
   testWidgets(
       'Closes Alert Dialog When Clicking ${HomeStrings().buttonCheckIn}',
       (WidgetTester tester) async {
-    await tester.pumpWidget(BattleBuddies());
+    await tester.pumpWidget(MaterialApp(
+      home: HomePage(),
+    ));
     // Open Dialog
     await tester.tap(find.byType(MaterialButton));
     await tester.pump();
