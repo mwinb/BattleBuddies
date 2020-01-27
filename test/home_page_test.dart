@@ -1,22 +1,22 @@
+import 'package:battle_buddies/main.dart';
+import 'package:battle_buddies/widgets/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:battle_buddies/widgets/main.dart';
-
 void main() {
-  const buttonText = 'New Outing';
-  const alertText = 'Coming Soon';
-  const closeDialog = 'Check In';
   testWidgets('Executes Alert Dialog When Clicking Button',
       (WidgetTester tester) async {
-    await tester.pumpWidget(BattleBuddies());
+    await tester.pumpWidget(
+      BattleBuddies(),
+    );
 
-    expect(find.text(buttonText), findsOneWidget);
+    expect(find.text('New Outing'), findsOneWidget);
 
-    await tester.tap(find.byType(MaterialButton));
+    await tester.tap(find.text(HomeStrings().buttonNewOuting));
     await tester.pump();
 
-    expect(find.text(alertText), findsOneWidget);
+    expect(find.text(HomeStrings().buttonAuto), findsOneWidget);
+    expect(find.text(HomeStrings().buttonCheckIn), findsOneWidget);
   });
 
   testWidgets('Closes Alert Dialog When Clicking Continue',
@@ -26,9 +26,9 @@ void main() {
     await tester.tap(find.byType(MaterialButton));
     await tester.pump();
     // Click closeDialog button.
-    await tester.tap(find.text(closeDialog));
+    await tester.tap(find.text(HomeStrings().buttonCheckIn));
     await tester.pump();
 
-    expect(find.text(alertText), findsNothing);
+    expect(find.text(HomeStrings().titleSelectType), findsNothing);
   });
 }
