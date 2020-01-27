@@ -12,6 +12,7 @@ class HomePage extends StatelessWidget {
   HomePage({Key key, this.title}) : super(key: key);
 
   final String title;
+  final HomeStrings _homeStrings = HomeStrings();
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +27,8 @@ class HomePage extends StatelessWidget {
             MaterialButton(
                 color: appTheme.buttonColor,
                 textColor: appTheme.primaryTextTheme.body1.color,
-                onPressed: () => _selectEventType(context),
-                child: Text(HomeStrings().buttonNewOuting)),
+                onPressed: () => _selectEventType(context, _homeStrings),
+                child: Text(_homeStrings.buttonNewOuting)),
           ],
         ),
       ),
@@ -35,14 +36,15 @@ class HomePage extends StatelessWidget {
   }
 }
 
-Future<void> _selectEventType(BuildContext context) async {
+Future<void> _selectEventType(
+    BuildContext context, HomeStrings _homeStrings) async {
   return showDialog<void>(
     context: context,
     barrierDismissible: false, // user must tap button!
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text(
-          HomeStrings().titleSelectType,
+          _homeStrings.titleSelectType,
           textAlign: TextAlign.center,
         ),
         content: SingleChildScrollView(
@@ -54,7 +56,7 @@ Future<void> _selectEventType(BuildContext context) async {
                   MaterialButton(
                     color: appTheme.buttonColor,
                     textColor: appTheme.primaryTextTheme.body1.color,
-                    child: Text(HomeStrings().buttonAuto),
+                    child: Text(_homeStrings.buttonAuto),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -62,7 +64,7 @@ Future<void> _selectEventType(BuildContext context) async {
                   MaterialButton(
                     color: appTheme.buttonColor,
                     textColor: appTheme.primaryTextTheme.body1.color,
-                    child: Text(HomeStrings().buttonCheckIn),
+                    child: Text(_homeStrings.buttonCheckIn),
                     onPressed: () {
                       Navigator.pop(context);
                     },
