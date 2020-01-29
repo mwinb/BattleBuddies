@@ -33,7 +33,6 @@ Future<void> _selectEventType(
     BuildContext context, HomeStrings _homeStrings) async {
   return showDialog<void>(
     context: context,
-    barrierDismissible: false, // user must tap button!
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text(
@@ -51,7 +50,7 @@ Future<void> _selectEventType(
                     textColor: appTheme.primaryTextTheme.body1.color,
                     child: Text(_homeStrings.buttonAuto),
                     onPressed: () {
-                      Navigator.pushNamed(
+                      Navigator.popAndPushNamed(
                         context,
                         NewOuting.routeName,
                         arguments: OutingArguments(true),
@@ -63,7 +62,7 @@ Future<void> _selectEventType(
                     textColor: appTheme.primaryTextTheme.body1.color,
                     child: Text(_homeStrings.buttonCheckIn),
                     onPressed: () {
-                      Navigator.pushNamed(
+                      Navigator.popAndPushNamed(
                         context,
                         NewOuting.routeName,
                         arguments: OutingArguments(false),
