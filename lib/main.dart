@@ -1,10 +1,11 @@
+import 'package:battle_buddies/widgets/current_outing.dart';
 import 'package:battle_buddies/widgets/home_page.dart';
 import 'package:battle_buddies/widgets/new_outing.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(BattleBuddies());
 
-ThemeData appTheme = ThemeData.dark();
+ThemeData appTheme = ThemeData.light();
 
 class BattleBuddies extends StatelessWidget {
   @override
@@ -16,6 +17,8 @@ class BattleBuddies extends StatelessWidget {
         routes: {
           HomePage.routeName: (context) => AppScaffold(body: HomePage()),
           NewOuting.routeName: (context) => AppScaffold(body: NewOuting()),
+          CurrentOuting.routeName: (context) =>
+              AppScaffold(body: CurrentOuting()),
         });
   }
 }
