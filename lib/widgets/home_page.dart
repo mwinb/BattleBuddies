@@ -55,13 +55,9 @@ class _HomePageState extends State<HomePage> {
     var outings = await dbInstance.queryAllRows();
     if (outings.length > 0) {
       var outing = outings[0];
-      if (DateTime.now().compareTo(outing.endDate) >= 0) {
-        await dbInstance.delete(outing.id);
-      } else {
-        Navigator.pushNamedAndRemoveUntil(
-            context, CurrentOuting.routeName, (r) => false,
-            arguments: outing);
-      }
+      Navigator.pushNamedAndRemoveUntil(
+          context, CurrentOuting.routeName, (r) => false,
+          arguments: outing);
     }
     setState(() {
       isLoading = false;

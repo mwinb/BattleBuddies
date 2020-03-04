@@ -5,7 +5,7 @@ import 'package:sqflite/sqlite_api.dart';
 
 class OutingDBHelper {
   static final _databaseName = 'OutingDatabase.db';
-  static final _databaseVersion = 1;
+  static final _databaseVersion = 2;
   static final outingTable = 'Outing';
 
   static final columnId = 'id';
@@ -15,6 +15,7 @@ class OutingDBHelper {
   static final columnCheckInInterval = 'check_in_interval';
   static final columnContactName = 'contact_name';
   static final columnContactNumber = 'contact_number';
+  static final columnHasAlarm = 'has_alarm';
 
   static final OutingDBHelper _instance = new OutingDBHelper.internal();
   static Database _database;
@@ -34,9 +35,18 @@ class OutingDBHelper {
         version: _databaseVersion, onCreate: _onCreate);
   }
 
+  getMostRecentOuting() async {
+    var dbInstance = OutingDBHelper();
+    var outings = await dbInstance.queryAllRows();
+    if (outings.length > 0) {
+      return outings[0];
+    } else
+      return null;
+  }
+
   Future _onCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE $outingTable($columnId INTEGER PRIMARY KEY, $columnIsAuto TEXT NOT NULL, $columnStartDate TEXT NOT NULL, $columnEndDate TEXT NOT NULL, $columnCheckInInterval INTEGER NOT NULL, $columnContactName TEXT NOT NULL, $columnContactNumber TEXT NOT NULL)");
+        "CREATE TABLE $outingTable($columnId INTEGER PRIMARY KEY, $columnIsAuto TEXT NOT NULL, $columnStartDate TEXT NOT NULL, $columnEndDate TEXT NOT NULL, $columnCheckInInterval INTEGER NOT NULL, $columnContactName TEXT NOT NULL, $columnContactNumber TEXT NOT NULL, $columnHasAlarm TEXT NOT NULL)");
   }
 
   Future<int> insert(Outing outing) async {

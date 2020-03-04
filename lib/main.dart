@@ -3,11 +3,25 @@ import 'package:battle_buddies/widgets/home_page.dart';
 import 'package:battle_buddies/widgets/new_outing.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(BattleBuddies());
+main() async {
+  runApp(BattleBuddies());
+}
 
 ThemeData appTheme = ThemeData.light();
 
-class BattleBuddies extends StatelessWidget {
+class BattleBuddies extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _BattleBuddiesState();
+  }
+}
+
+class _BattleBuddiesState extends State<BattleBuddies> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,7 +29,9 @@ class BattleBuddies extends StatelessWidget {
         theme: appTheme,
         initialRoute: '/',
         routes: {
-          HomePage.routeName: (context) => AppScaffold(body: HomePage()),
+          HomePage.routeName: (context) => AppScaffold(
+                body: HomePage(),
+              ),
           NewOuting.routeName: (context) => AppScaffold(body: NewOuting()),
           CurrentOuting.routeName: (context) =>
               AppScaffold(body: CurrentOuting()),
@@ -26,6 +42,7 @@ class BattleBuddies extends StatelessWidget {
 class AppScaffold extends StatelessWidget {
   const AppScaffold({Key key, this.body}) : super(key: key);
   final Widget body;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -38,7 +38,7 @@ class _NewOutingState extends State<NewOuting> {
         '/',
       );
     }
-    final Duration minDuration = new Duration(minutes: 30);
+    final Duration minDuration = new Duration(seconds: 30);
     final Duration maxTimerDays = new Duration(days: 2);
     DateTime maxDate = DateTime.now().add(maxTimerDays);
 

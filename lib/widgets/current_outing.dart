@@ -1,26 +1,18 @@
 import 'dart:async';
-
+import 'dart:ui';
+import 'package:battle_buddies/models/geo_locator_helper.dart';
 import 'package:battle_buddies/models/outing.dart';
 import 'package:battle_buddies/outing_db_helper.dart';
+import 'package:battle_buddies/models/local_notification.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:sms/sms.dart';
 
-Future<void> checkOuting(BuildContext context) async {
-  var dbInstance = new OutingDBHelper();
-  var outings = await dbInstance.queryAllRows();
-  if (outings.length > 0) {
-    if (DateTime.now().compareTo(outings[0].endDate) >= 0) {
-      await dbInstance.delete(outings[0].id);
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/',
-        (r) => false,
-      );
-    }
-  }
-}
+import '../main.dart';
+
+const String channelId = 'Battle Buddies';
 
 class CurrentOuting extends StatefulWidget {
   CurrentOuting({Key key}) : super(key: key);
@@ -31,18 +23,116 @@ class CurrentOuting extends StatefulWidget {
 }
 
 class _CurrentOutingState extends State<CurrentOuting> {
-  Timer timer;
+  Future<void> checkOuting(BuildContext context) async {
+    var currentOuting = await OutingDBHelper().getMostRecentOuting();
+    if (currentOuting != null) {
+      if (DateTime.now().compareTo(currentOuting.endDate) >= 0 &&
+          !currentOuting.hasAlarm) {
+        await OutingDBHelper().delete(currentOuting.id);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/',
+          (r) => false,
+        );
+      } else if (!currentOuting.hasAlarm) {
+        currentOuting.setAlarm();
+        await OutingDBHelper().update(currentOuting);
+        await LocalNotification.getState().executeNotification(currentOuting);
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    timer = new Timer.periodic(
-        new Duration(seconds: 30), (Timer t) => checkOuting(context));
+    LocalNotification.getState().initialize(onSelectNotification);
+    checkOuting(context);
+  }
+
+  Future sendMessage(bool withGps, String phoneNumber) async {
+    SmsSender sender = new SmsSender();
+    String cleanPhoneNumber = phoneNumber.replaceAll(new RegExp('[^0-9]'), '');
+    String message = "Just Checking in ";
+
+    if (withGps) {
+      var position = await GeoLocatorHelper.getCurrentPosition();
+      if (position != null) {
+        message = message +
+            GeoLocatorHelper.getLocationURL(
+                position.longitude, position.latitude);
+      } else {
+        message = message + "currently unable to send location";
+      }
+    }
+    await sender.sendSms(new SmsMessage(cleanPhoneNumber, message));
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/',
+      (r) => false,
+    );
+  }
+
+  Future onSelectNotification(String payload) async {
+    if (payload == LocalNotification.getState().payload) {
+      Outing currentOuting = await OutingDBHelper().getMostRecentOuting();
+      if (currentOuting != null) {
+        if (currentOuting.hasAlarm) {
+          currentOuting.cancelAlarm();
+          await OutingDBHelper().update(currentOuting);
+          var phoneNumber = currentOuting.contact.phoneNumber.number;
+          if (currentOuting.isAuto) {
+            await sendMessage(true, phoneNumber);
+          } else {
+            print("made it");
+            return await showDialog<void>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text(
+                    'Select checkin Message',
+                    textAlign: TextAlign.center,
+                  ),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            MaterialButton(
+                              color: appTheme.buttonColor,
+                              child: Text('GPS'),
+                              onPressed: () async {
+                                await sendMessage(true, phoneNumber);
+                              },
+                            ),
+                            MaterialButton(
+                              color: appTheme.buttonColor,
+                              child: Text('No GPS'),
+                              onPressed: () async {
+                                await sendMessage(false, phoneNumber);
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  '/',
+                                  (r) => false,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+        }
+      }
+    }
   }
 
   @override
   void dispose() {
-    timer?.cancel();
     super.dispose();
   }
 
@@ -216,6 +306,7 @@ class _CurrentOutingState extends State<CurrentOuting> {
                   label: Text('Cancel Outing'),
                   onPressed: () async {
                     var db = new OutingDBHelper();
+                    await LocalNotification.getState().cancelNotifications();
                     await db.delete(args.id);
                     Navigator.popAndPushNamed(context, '/');
                   },
