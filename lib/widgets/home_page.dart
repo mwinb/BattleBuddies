@@ -10,7 +10,7 @@ import 'new_outing.dart';
 class HomeStrings {
   get titleSelectType => 'Choose Interval Type';
   get buttonAuto => 'Auto';
-  get buttonCheckIn => 'Check In';
+  get buttonCheckIn => 'Manual';
   get buttonNewOuting => 'New Outing';
 }
 
@@ -78,6 +78,18 @@ Future<void> _selectEventType(
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text('Auto: Sends gps on tap'),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text('Manual: Choose to send gps on tap'),
+                ],
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[

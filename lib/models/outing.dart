@@ -1,7 +1,5 @@
 import 'package:contact_picker/contact_picker.dart';
 
-import '../outing_db_helper.dart';
-
 class Outing {
   int id = 0;
   bool isAuto;
