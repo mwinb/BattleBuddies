@@ -24,7 +24,7 @@ class CurrentOuting extends StatefulWidget {
 
 class _CurrentOutingState extends State<CurrentOuting> {
   Future<void> checkOuting(BuildContext context) async {
-    var currentOuting = await OutingDBHelper().getMostRecentOuting();
+    Outing currentOuting = await OutingDBHelper().getMostRecentOuting();
     if (currentOuting != null) {
       if (DateTime.now().compareTo(currentOuting.endDate) >= 0 &&
           !currentOuting.hasAlarm) {
@@ -47,6 +47,54 @@ class _CurrentOutingState extends State<CurrentOuting> {
     super.initState();
     LocalNotification.getState().initialize(onSelectNotification);
     checkOuting(context);
+  }
+
+  Future<void> requestCheckInType(
+      BuildContext context, String phoneNumber) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        Future.delayed(Duration(seconds: 10), () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/',
+            (r) => false,
+          );
+        });
+        return AlertDialog(
+          title: Text(
+            'Select checkin Message',
+            textAlign: TextAlign.center,
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    MaterialButton(
+                      color: appTheme.buttonColor,
+                      child: Text('GPS'),
+                      onPressed: () async {
+                        await sendMessage(true, phoneNumber);
+                      },
+                    ),
+                    MaterialButton(
+                      color: appTheme.buttonColor,
+                      child: Text('No GPS'),
+                      onPressed: () async {
+                        await sendMessage(false, phoneNumber);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future sendMessage(bool withGps, String phoneNumber) async {
@@ -77,54 +125,14 @@ class _CurrentOutingState extends State<CurrentOuting> {
       Outing currentOuting = await OutingDBHelper().getMostRecentOuting();
       if (currentOuting != null) {
         if (currentOuting.hasAlarm) {
+          var phoneNumber = currentOuting.contact.phoneNumber.number;
           currentOuting.cancelAlarm();
           await OutingDBHelper().update(currentOuting);
-          var phoneNumber = currentOuting.contact.phoneNumber.number;
+
           if (currentOuting.isAuto) {
             await sendMessage(true, phoneNumber);
           } else {
-            print("made it");
-            return await showDialog<void>(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text(
-                    'Select checkin Message',
-                    textAlign: TextAlign.center,
-                  ),
-                  content: SingleChildScrollView(
-                    child: ListBody(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            MaterialButton(
-                              color: appTheme.buttonColor,
-                              child: Text('GPS'),
-                              onPressed: () async {
-                                await sendMessage(true, phoneNumber);
-                              },
-                            ),
-                            MaterialButton(
-                              color: appTheme.buttonColor,
-                              child: Text('No GPS'),
-                              onPressed: () async {
-                                await sendMessage(false, phoneNumber);
-                                Navigator.pushNamedAndRemoveUntil(
-                                  context,
-                                  '/',
-                                  (r) => false,
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
+            return await requestCheckInType(context, phoneNumber);
           }
         }
       }
@@ -283,7 +291,7 @@ class _CurrentOutingState extends State<CurrentOuting> {
                     top: 16.0,
                   ),
                   child: Text(
-                    args.contact.phoneNumber.toString(),
+                    args.contact.phoneNumber.number,
                     textScaleFactor: 1.3,
                   ),
                 ),

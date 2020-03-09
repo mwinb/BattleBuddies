@@ -4,13 +4,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 class LocalNotification {
   static LocalNotification _instance;
   FlutterLocalNotificationsPlugin notificationPlugin;
-  bool isInitialized;
   bool hasNotifications;
   String payload = "Execute";
 
   LocalNotification() {
     this.notificationPlugin = new FlutterLocalNotificationsPlugin();
-    this.isInitialized = false;
     this.hasNotifications = false;
   }
 
@@ -30,11 +28,15 @@ class LocalNotification {
         initializationSettingsAndroid, initializationSettingsIOS);
     this.notificationPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
-    this.isInitialized = true;
   }
 
   executeNotification(Outing outing) async {
     await this.cancelNotifications();
+    String title = "Check In Time!";
+    String body = outing.isAuto
+        ? "Tap To Send Location to: "
+        : "Tap to choose Message to send to: ";
+    body = body + '${outing.contact.fullName}';
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails('outing', 'outing', 'Check In');
     IOSNotificationDetails iOSPlatformChannelSpecifics =
@@ -44,11 +46,12 @@ class LocalNotification {
     this.hasNotifications = true;
     await this.notificationPlugin.schedule(
           0,
-          'Auto Checking In',
-          'Checking in with ${outing.contact.fullName}',
+          title,
+          body,
           DateTime.now().add(outing.checkInInterval),
           platformChannelSpecifics,
           payload: this.payload,
+          androidAllowWhileIdle: true,
         );
   }
 
